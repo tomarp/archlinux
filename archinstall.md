@@ -1,10 +1,11 @@
 ## Archlinux installation
 
-# keyboard setting
+## keyboard setting
 $ localectl list-keymaps | grep latin1
 $ loadkeys <name-keymap>
 
-# connect to wifi
+## connect to wifi
+```
 $ iwctl
 [iwctl]# device list 
 wlano		# wireless interface name
@@ -13,12 +14,13 @@ wlano		# wireless interface name
 [iwctl]# exit
 ip addr show		# check ip address for wireless interface
 $ ping -c 5 archlinux.org
+```
 
-# connect vis ssh
+### connect vis ssh
 $ passwd 		# set root passwd
 $ ssh root@<ip-addr>
 
-# time date setup
+### time date setup
 $ timedatectl
 $ timedatectl list-timezones | grep Berlin
 $ timedatectl set-timezone Europe/Berlin
@@ -26,15 +28,18 @@ $ timedatectl set-timezone Europe/Berlin
 -----------------------------------------------------------------------------
 ## setup disk partition setup UEFI with "encryption" 
 
-# check if my machine is efi or not
+### check if my machine is efi or not
 $ ls /sys/firmware/efi/efivars		# if content display then mac in EFI
 
-# use fdisk /dev/partition or gdisk /dev/partition
+### use fdisk /dev/partition or gdisk /dev/partition
+```
 $ lsblk
 $ fdisk -l
 $ fdisk /dev/nvme1n1
+```
 
-# Create a new partition 1 of type "EFI filesystem" and of size 500MiB 
+### Create a new partition 1 of type "EFI filesystem" and of size 500MiB 
+```
 $ g	# create a new GPT disklabel
 $ n	# new partition
 $ 1	# Partition number (default)
@@ -42,8 +47,10 @@ $ default	# First sector (default)
 $ +1024M	# Last sector
 $ t	# Partition type
 $ 1	# partition type (1 is for EFI System)
+```
 
-# Create a new partition 2 of type "Linux filesystem" and of size 100%FREE
+### Create a new partition 2 of type "Linux filesystem" and of size 100%FREE
+```
 $ g       # create a new GPT disklabel
 $ n       # new partition
 $ 2       # Partition number (default)
@@ -55,18 +62,17 @@ $ 44       # partition type (44 is for LVM System)
 
 $ p	# print partition table just created
 $ w	# write partition table on the disk
+```
 ----------------------------------------------------------------------------------------
-OUTPUT:
+```OUTPUT:
 
 Device		       Start		 End		  Sectors		Size	 Type
 /dev/nvme1n1p1	2048		1026047		1024000		1024M	EFI System
 /dev/nvme1n1p2	2050048		1048575966	1046525919	950G	Linux LVM
+```
 -----------------------------------------------------------------------------------------
 
-$ mkfs.fat -F32 /dev/nvme1n1p1 	# format first partition
-
-To encrypt our '/' partition, we will use the cryptsetup tool:
-
+###To encrypt our '/' partition, we will use the cryptsetup tool:
 ```
 cryptsetup --hash sha512 --use-random --verify-passhphrase luksFormat /dev/nvme0n1p2
 Are you sure? YES
@@ -83,9 +89,11 @@ Enter passhphrase
 ```
 The decrypted container is now available at `/dev/mapper/cryptlvm`.
 
-# Unlock encrypted partition
+### Unlock encrypted partition
+```
 $ cryptsetup open --type luks /dev/nvme1n1p3 lvm
 Enter passphrase for /dev/nvme1n1p3:
+```
 
 ## Setup the LVM
 LVM is a logical volume manager for the Linux kernel. It is thank to to it that we can easily resize our partitions if necessary.
@@ -104,12 +112,11 @@ LVM is a logical volume manager for the Linux kernel. It is thank to to it that 
 ```
 $ mkfs.fat -F32 /dev/nvme0n1p1
 $ mkfs.btrfs -L btrfs /dev/mapper/vg-root
-```
 
 $ modprobe dm_mod
 $ vgscan
 $ vgchange -ay
-
+```
 ------------------------------------------------------------------------------------------------
 ## Create Btrfs subvolumes
 ```
@@ -134,10 +141,11 @@ $ mount /dev/nvme1n1p1 /mnt/boot
 $ mkfs.ext4 /dev/volgroup0/lv_home
 $ mkdir /mnt/home
 $ mount /dev/volgroup0/lv_home /mnt/home
+```
 ---------------------------------------------------------------------------------------------------------
 
-# OPTION 3: btrfs partition setup
-
+## OPTION 3: btrfs partition setup
+```
 $ mount /dev/nvme1n1p1 /mnt
 
 $ cd /mnt
@@ -150,6 +158,7 @@ $ mount -o noatime,ssd,space_cache=v2,compress=zstd,discard=async,subvol=@ /dev/
 
 $ mkdir /mnt/home
 $ mount -o noatime,ssd,space_cache=v2,compress=zstd,discard=async,subvol=@home /dev/nvme1n1p2 /mnt/home
+```
 ------------------------------------------------------------------------------------------------------------
 
 $ reflector --threads 8 --sort rate --save --country Germany /etc/pacman.d/mirrorlist
@@ -157,8 +166,7 @@ $ reflector --threads 8 --sort rate --save --country Germany /etc/pacman.d/mirro
 ## Installation of the packages onto a given root file system
 ``` $ pacstrap /mnt base linux linux-firmware linux-tools ```
 
-## COnfiguration of the system
-```
+## Configuration of the system
 ### generate fstab
 ```
 $ mkdir /mnt/etc
