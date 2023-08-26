@@ -6,7 +6,7 @@ $ localectl list-keymaps | grep latin1
 $ loadkeys <name-keymap>
 ```
 
-### connect to wifi
+### Connect to wifi
 ```
 $ iwctl
 [iwctl]# device list 
@@ -18,25 +18,26 @@ $ ip addr show		# check ip address for wireless interface
 $ ping -c 5 archlinux.org
 ```
 
-### connect vis ssh
-
-```$ passwd 		# set root passwd
+### Connect via ssh
+```
+$ passwd 		# set root passwd
 $ ssh root@<ip-addr>
 ```
-### time date setup
+
+### Time date setup
 ```
 $ timedatectl
 $ timedatectl list-timezones | grep Berlin
 $ timedatectl set-timezone Europe/Berlin
 ```
 
-### setup disk partition setup UEFI with "encryption" 
+### Setup disk partition setup UEFI with "encryption" 
 Check if my machine is efi or not
 ```
 $ ls /sys/firmware/efi/efivars		# if content display then mac in EFI
 ```
 
-### use fdisk /dev/partition or gdisk /dev/partition
+### Use fdisk /dev/partition or gdisk /dev/partition
 ```
 $ lsblk
 $ fdisk -l
@@ -163,14 +164,16 @@ $ mkdir /mnt/home
 $ mount -o noatime,ssd,space_cache=v2,compress=zstd,discard=async,subvol=@home /dev/nvme1n1p2 /mnt/home
 ```
 ------------------------------------------------------------------------------------------------------------
-
+### Setup mirror
+```
 $ reflector --threads 8 --sort rate --save --country Germany /etc/pacman.d/mirrorlist
+```
 
 ### Installation of the packages onto a given root file system
 ``` $ pacstrap /mnt base linux linux-firmware linux-tools ```
 
 ### Configuration of the system
-### generate fstab
+Generate fstab
 ```
 $ mkdir /mnt/etc
 $ genfstab -U -p /mnt >> /mnt/etc/fstab
@@ -207,7 +210,6 @@ $ mount /dev/nvme0n1p1 /mnt/boot/efi
 ```
 -------------------------------------------------------------------------------------------------------------
 
-### Set the timezone
 ### Install the Network Time Protocol and enable it as daemon:
 ```
 $ pacman -S ntp
@@ -219,7 +221,8 @@ $ systemctl enable ntpd
 $ ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
 ```
 
-### Generate /etc/adjtime:
+### Set the timezone
+Generate /etc/adjtime:
 ``` 
 $ hwclock --systohc
 $ echo "LANG=en_US.UTF-8" >> /etc/locale.conf
@@ -310,3 +313,4 @@ $ sudo timeshift --create --comments "FIrst backup" --tags D
 # btrfs record snapstop automatically on system update/upgrade
 $ grub-mkconfig -o /boot/grub/grub.cfg		# this will record timeshift snapshot as well
 ```
+
