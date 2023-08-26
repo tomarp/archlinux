@@ -1,12 +1,12 @@
 # Archlinux installation guide
 
-## keyboard setting
+### Keyboard setting
 ```
 $ localectl list-keymaps | grep latin1
 $ loadkeys <name-keymap>
 ```
 
-## connect to wifi
+### connect to wifi
 ```
 $ iwctl
 [iwctl]# device list 
@@ -28,7 +28,7 @@ $ timedatectl list-timezones | grep Berlin
 $ timedatectl set-timezone Europe/Berlin
 
 -----------------------------------------------------------------------------
-## setup disk partition setup UEFI with "encryption" 
+### setup disk partition setup UEFI with "encryption" 
 
 ### check if my machine is efi or not
 $ ls /sys/firmware/efi/efivars		# if content display then mac in EFI
@@ -74,7 +74,7 @@ Device		       Start		 End		  Sectors		Size	 Type
 ```
 -----------------------------------------------------------------------------------------
 
-###To encrypt our '/' partition, we will use the cryptsetup tool:
+### To encrypt our '/' partition, we will use the cryptsetup tool:
 ```
 cryptsetup --hash sha512 --use-random --verify-passhphrase luksFormat /dev/nvme0n1p2
 Are you sure? YES
@@ -97,20 +97,20 @@ $ cryptsetup open --type luks /dev/nvme1n1p3 lvm
 Enter passphrase for /dev/nvme1n1p3:
 ```
 
-## Setup the LVM
+### Setup the LVM
 LVM is a logical volume manager for the Linux kernel. It is thank to to it that we can easily resize our partitions if necessary.
-## Create a physical volume on top of the opened LUKS container
+### Create a physical volume on top of the opened LUKS container
 ``` $ pvcreate /dev/mapper/cryptlvm ```
 
 ### Add the previously created physical volume to a volume group
 ``` $ vgcreate volgroup0 /dev/mapper/cryptlvm ```
 
-## Create the swap logical volume on the volume group
+### Create the swap logical volume on the volume group
 
-## Create the root logical volume on the volume group
+### Create the root logical volume on the volume group
 ``` $ lvcreate -l 100%FREE volgroup0 -n vg_root ```
 
-## Formatting the filesystem
+### Formatting the filesystem
 ```
 $ mkfs.fat -F32 /dev/nvme0n1p1
 $ mkfs.btrfs -L btrfs /dev/mapper/vg-root
@@ -120,7 +120,7 @@ $ vgscan
 $ vgchange -ay
 ```
 ------------------------------------------------------------------------------------------------
-## Create Btrfs subvolumes
+### Create Btrfs subvolumes
 ```
 $ mount /dev/mapper/vg_root /mnt
 $ btrfs subvolume create /mnt/root
@@ -128,7 +128,7 @@ $ btrfs subvolume create /mnt/home
 $ umount /mnt
 ```
 
-## Mounting Btrfs subvolumes
+### Mounting Btrfs subvolumes
 ```
 $ SSD_MOUNTS="autodefrag,compress=lzo,discard,noatime,nodev,rw,space_cache,ssd"
 $ mount -o subvol=root,$SSD_MOUNTS /dev/mapper/vg_root /mnt
@@ -146,7 +146,7 @@ $ mount /dev/volgroup0/lv_home /mnt/home
 ```
 ---------------------------------------------------------------------------------------------------------
 
-## OPTION 3: btrfs partition setup
+### OPTION 3: btrfs partition setup
 ```
 $ mount /dev/nvme1n1p1 /mnt
 
@@ -165,10 +165,10 @@ $ mount -o noatime,ssd,space_cache=v2,compress=zstd,discard=async,subvol=@home /
 
 $ reflector --threads 8 --sort rate --save --country Germany /etc/pacman.d/mirrorlist
 
-## Installation of the packages onto a given root file system
+### Installation of the packages onto a given root file system
 ``` $ pacstrap /mnt base linux linux-firmware linux-tools ```
 
-## Configuration of the system
+### Configuration of the system
 ### generate fstab
 ```
 $ mkdir /mnt/etc
@@ -179,7 +179,7 @@ $ cat /mnt/etc/fstab	# check mounted partition on fstab
 ### Change root into new system
 ``` $ arch-chroot /mnt ```
 
-## Create the swap file
+### Create the swap file
 ```
 $ truncate -s 0 /swapfile
 $ chattr +C /swapfile
@@ -192,7 +192,7 @@ $ btrfs property set /swapfile compression none
 ###Set the permission for the file (a world-readable swap file is a huge local vulnerability):
 ```$ chmod 600 /swapfile ```
 
-## Format the /swapfile file to swap and activate it:
+### Format the /swapfile file to swap and activate it:
 ```
 $ mkswap /swapfile
 $ swapon /swapfile
@@ -206,7 +206,7 @@ $ mount /dev/nvme0n1p1 /mnt/boot/efi
 ```
 -------------------------------------------------------------------------------------------------------------
 
-## Set the timezone
+### Set the timezone
 ### Install the Network Time Protocol and enable it as daemon:
 ```
 $ pacman -S ntp
@@ -234,14 +234,14 @@ $ systemctl enable NetworkManager
 ### add a hostname to the machine:
 ``` $ echo arch > /etc/hostname ```
 
-## Add matching entries to /etc/hosts:
+### Add matching entries to /etc/hosts:
 ```
 127.0.0.1		localhost
 ::1					   localhost
 127.0.1.1		arch.localdomain	arch
 ```
 
-## Create the main user
+### Create the main user
 ```
 $ useradd -mG storage,wheel -s /bin/bash username
 $ passwd *****
@@ -254,7 +254,7 @@ $ EDITOR=nano visudo
 $ usermod -c 'Puneet Tomar' tomar	# show full name instead of username on login
 ```
 
-## You should the HOOKS field with these things:
+### You should the HOOKS field with these things:
 ```
 $ vim /etc/mkinitcpio.conf
 HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt lvm2 filesystems btrfs)
