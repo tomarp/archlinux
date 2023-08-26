@@ -69,14 +69,6 @@ $ 44       # partition type (44 is for LVM System)
 $ p	# print partition table just created
 $ w	# write partition table on the disk
 ```
-----------------------------------------------------------------------------------------
-```OUTPUT:
-
-Device		       Start		 End		  Sectors		Size	 Type
-/dev/nvme1n1p1	2048		1026047		1024000		1024M	EFI System
-/dev/nvme1n1p2	2050048		1048575966	1046525919	950G	Linux LVM
-```
------------------------------------------------------------------------------------------
 
 ### To encrypt our '/' partition, we will use the cryptsetup tool:
 ```
