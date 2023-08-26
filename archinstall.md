@@ -19,19 +19,22 @@ $ ping -c 5 archlinux.org
 ```
 
 ### connect vis ssh
-$ passwd 		# set root passwd
-$ ssh root@<ip-addr>
 
+```$ passwd 		# set root passwd
+$ ssh root@<ip-addr>
+```
 ### time date setup
+```
 $ timedatectl
 $ timedatectl list-timezones | grep Berlin
 $ timedatectl set-timezone Europe/Berlin
+```
 
------------------------------------------------------------------------------
 ### setup disk partition setup UEFI with "encryption" 
-
-### check if my machine is efi or not
+Check if my machine is efi or not
+```
 $ ls /sys/firmware/efi/efivars		# if content display then mac in EFI
+```
 
 ### use fdisk /dev/partition or gdisk /dev/partition
 ```
@@ -82,9 +85,7 @@ Enter passhphrase (twice)
 ```
 
 Opening the root LUKS volume as block device
-
 The / partition being encrypted, we will open the LUKS container on /dev/nvme0n1p2 disk and name it cryptlvm:
-
 ```
 cryptsetup open /dev/nvme1n1p2 cryptlvm
 Enter passhphrase
