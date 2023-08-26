@@ -1,0 +1,11 @@
+[Applications][org.onionshare.OnionShare]
+Seen=true
+
+[Applications][org.telegram.desktop]
+Seen=true
+
+[DoNotDisturb]
+Until=2023,8,25,12,31,0.921
+
+[Notifications]
+PopupTimeout=3000
