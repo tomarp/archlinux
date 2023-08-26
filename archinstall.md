@@ -187,8 +187,7 @@ $ btrfs property set /swapfile compression none
 ```
 
 ### Is recommended to set the size of swap file being 4-8GB if you don't intend to use hibernation (suspend-to-disk):
-```
-$ dd if=/dev/zero of=/swapfile bs=1M count=16384 status=progress && sync
+``` $ dd if=/dev/zero of=/swapfile bs=1M count=16384 status=progress && sync ```
 
 ###Set the permission for the file (a world-readable swap file is a huge local vulnerability):
 ```$ chmod 600 /swapfile ```
@@ -199,16 +198,15 @@ $ mkswap /swapfile
 $ swapon /swapfile
 ```
 
-###Finally, add an entry for the swap file in the fstab:
-``` $ echo "/swapfile none swap defaults 0 0" >> /etc/fstab ```
+### Finally, add an entry for the swap file in the fstab:
 ```
+$ echo "/swapfile none swap defaults 0 0" >> /etc/fstab
 $ mkdir -p /mnt/boot/efi
 $ mount /dev/nvme0n1p1 /mnt/boot/efi
 ```
 -------------------------------------------------------------------------------------------------------------
 
 ## Set the timezone
-
 ### Install the Network Time Protocol and enable it as daemon:
 ```
 $ pacman -S ntp
@@ -221,10 +219,13 @@ $ ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
 ```
 
 ### Generate /etc/adjtime:
-``` $ hwclock --systohc ```
+``` 
+$ hwclock --systohc
+$ echo "LANG=en_US.UTF-8" >> /etc/locale.conf
+$ echo "KEYMAP=en_DE-latin1" >> /etc/vconsole.conf
+```
 
-## Network configuration
-### Install and enable network management daemon:
+### Network configuration
 ```
 $ pacman -S networkmanager
 $ systemctl enable NetworkManager
@@ -245,15 +246,13 @@ $ systemctl enable NetworkManager
 $ useradd -mG storage,wheel -s /bin/bash username
 $ passwd *****
 ```
+
 ### Finally, change the /etc/sudoers file according to the config that you want to deal with sudo command.
 ```
 $ EDITOR=nano visudo
 %wheel ALL=(ALL) ALL	# uncomment this line
 $ usermod -c 'Puneet Tomar' tomar	# show full name instead of username on login
 ```
-
-$ echo "LANG=en_US.UTF-8" >> /etc/locale.conf
-$ echo "KEYMAP=en_DE-latin1" >> /etc/vconsole.conf
 
 ## You should the HOOKS field with these things:
 ```
@@ -263,17 +262,19 @@ $ mkinitcpio -p linux
 $ mkinitcpio -p linux-lts
 ```
 
+### Install required packages
+```
 $ pacman -S grub amd-ucode efibootmgr networkmanager network-manager-applet dialog wpa_supplicant mtools dosfstools reflector base-devel linux-headers bluez  bluez-utils cups hplip alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack bash-completion openssh rsync acpi acpi_call tlp sof_firmware acpid os-prober ntfs-3g nvidia nvida-utils nvidia-settings man
 
 $ pacman -S grub efibootmgr dosfstools os-prober mtools
 
-grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+$ grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
 
-grub-mkconfig -o /boot/grub/grub.cfg
+$ grub-mkconfig -o /boot/grub/grub.cfg
 
-enable os-prober
-vim /etc/default/grub 	# uncomment GRUB_DISABLE_OS_PROBER=false
-grub-mkconfig -o /boot/grub/grub.cfg
+### enable os-prober
+v$ im /etc/default/grub 	# uncomment GRUB_DISABLE_OS_PROBER=false
+$ grub-mkconfig -o /boot/grub/grub.cfg
 
 systemctl enable NetworkManager
 systemctl enable bluetooth
