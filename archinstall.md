@@ -1,8 +1,10 @@
-## Archlinux installation
+# Archlinux installation guide
 
 ## keyboard setting
+```
 $ localectl list-keymaps | grep latin1
 $ loadkeys <name-keymap>
+```
 
 ## connect to wifi
 ```
@@ -12,7 +14,7 @@ wlano		# wireless interface name
 [iwctl]# station <wlan0> get-networks
 [iwctl]# station <wlan0> connect <"wifi-name">
 [iwctl]# exit
-ip addr show		# check ip address for wireless interface
+$ ip addr show		# check ip address for wireless interface
 $ ping -c 5 archlinux.org
 ```
 
@@ -282,33 +284,27 @@ systemctl enable reflector.timer
 systemctl enable fstrim.timer
 systemctl enable acpid
 
+$ exit
+$ umount -R /mnt
+$ reboot
+```
 
-exit
+### After reboot 
+```
+$ nmuti 	# Activate connection
 
-umount -R /mnt
-
-reboot
-
-## after reboot 
-
-nmuti 	# Activate connection
-
-sudo grub-mkconfig -o /boot/grub/grub.cfg 	# it should detect windows boot manager as well
+$ sudo grub-mkconfig -o /boot/grub/grub.cfg 	# it should detect windows boot manager as well
 sudo pacman -S git
 
 $ git clone https://aur.archlinux.org/yay-bin
-
 $ cd yay-bin
 $ makepkg -si
 
 $ yay -S timeshift-bin timeshift-autosnap
-
 $ sudo timeshift --list-devices
-
 $ sudo timeshift --snapshot-devices
-
 $ sudo timeshift --create --comments "FIrst backup" --tags D
 
 # btrfs record snapstop automatically on system update/upgrade
 $ grub-mkconfig -o /boot/grub/grub.cfg		# this will record timeshift snapshot as well
-
+```
